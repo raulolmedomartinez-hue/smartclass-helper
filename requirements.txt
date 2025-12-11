@@ -1,1 +1,7 @@
+streamlit
+openai
+pypdf2
+pytesseract
+pillow
+openai-whisper
 
