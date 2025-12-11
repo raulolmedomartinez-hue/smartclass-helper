@@ -9,7 +9,7 @@ import os
 # ---------------------------------------
 # CONFIGURACIÓN API (SECRETS)
 # ---------------------------------------
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+client = OpenAI(api_key=os.getenv("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"))
 
 # ---------------------------------------
 # FUNCIONES IA
