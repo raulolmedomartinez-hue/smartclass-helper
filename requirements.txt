@@ -1,6 +1,7 @@
 streamlit
-openai
-pypdf2
+transformers
+torch
+Pillow
+PyPDF2
 pytesseract
-pillow
-openai-whisper
+whisper
