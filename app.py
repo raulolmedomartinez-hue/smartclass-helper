@@ -6,7 +6,8 @@ from PIL import Image
 import whisper
 
 # ------------------ INICIALIZACIÓN MODELOS ------------------
-generator = pipeline("text-generation", model="gpt2")  # Modelo gratuito
+# Usamos distilgpt2 y CPU para evitar errores en Streamlit Cloud
+generator = pipeline("text-generation", model="distilgpt2", device=-1)
 
 # ------------------ FUNCIONES IA ------------------
 def consultar_gpt(prompt):
@@ -79,8 +80,8 @@ h1, h2, h3 {
     border-radius: 12px;
     border: 2px solid #1f3b82;
     padding: 10px;
-    background-color: #ffffff;  /* fondo blanco */
-    color: #000000;             /* texto negro */
+    background-color: #ffffff !important;  /* fondo blanco */
+    color: #000000 !important;             /* texto negro visible */
 }
 
 /* Headers de sección */
