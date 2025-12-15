@@ -5,11 +5,11 @@ import pytesseract
 from PIL import Image
 import whisper
 import os
+from openai import OpenAI
 
-# ---------------------------------------
-# CONFIGURACIÓN API (SECRETS)
-# ---------------------------------------
-client = OpenAI(api_key=os.getenv("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"))
+client = OpenAI(
+    api_key=os.getenv("OPENAI_API_KEY")
+)
 
 # ---------------------------------------
 # FUNCIONES IA
