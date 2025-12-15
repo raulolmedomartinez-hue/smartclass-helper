@@ -1,13 +1,15 @@
 import streamlit as st
-from transformers import pipeline
+from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
 from PyPDF2 import PdfReader
 import pytesseract
 from PIL import Image
 import whisper
 
 # ------------------ INICIALIZACIÓN MODELOS ------------------
-# Usamos distilgpt2 y CPU para evitar errores en Streamlit Cloud
-generator = pipeline("text-generation", model="distilgpt2", device=-1)
+# Modelo ligero de Hugging Face compatible con CPU
+tokenizer = AutoTokenizer.from_pretrained("EleutherAI/gpt-neo-125M")
+model = AutoModelForCausalLM.from_pretrained("EleutherAI/gpt-neo-125M")
+generator = pipeline("text-generation", model=model, tokenizer=tokenizer, device=-1)
 
 # ------------------ FUNCIONES IA ------------------
 def consultar_gpt(prompt):
