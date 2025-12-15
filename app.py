@@ -118,5 +118,3 @@ elif opcion == "Transcripción Audio":
         st.success("✅ Resumen del audio:")
         st.markdown(f"<div style='background:#f0fff0;padding:10px;border-radius:10px;'>{resumir_texto(texto_transcrito)}</div>", unsafe_allow_html=True)
 
-        st.markdown(f"<div class='output-box'>{resumen}</div>", unsafe_allow_html=True)
-
