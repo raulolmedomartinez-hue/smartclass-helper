@@ -67,7 +67,7 @@ opcion = st.sidebar.selectbox("Selecciona la función", [
 # ------------------ FUNCIONES ------------------
 if opcion == "Resumidor":
     st.subheader("📝 Resumidor de Textos")
-    texto = st.text_area("Introduce el texto")
+    texto = st.text_area("Introduce el texto")  # Texto visible
     if st.button("Resumir"):
         if texto:
             st.success("✅ Resumen generado:")
@@ -75,7 +75,7 @@ if opcion == "Resumidor":
 
 elif opcion == "Ejercicios":
     st.subheader("📚 Generador de Ejercicios")
-    texto = st.text_area("Introduce el tema")
+    texto = st.text_area("Introduce el tema")  # Texto visible
     if st.button("Generar ejercicios"):
         if texto:
             st.success("✅ Ejercicios generados:")
@@ -83,7 +83,7 @@ elif opcion == "Ejercicios":
 
 elif opcion == "Organizador Tareas":
     st.subheader("📅 Organizador de Tareas")
-    texto = st.text_area("Introduce tus tareas")
+    texto = st.text_area("Introduce tus tareas")  # Texto visible
     if st.button("Organizar"):
         if texto:
             st.success("✅ Tareas organizadas:")
@@ -91,7 +91,7 @@ elif opcion == "Organizador Tareas":
 
 elif opcion == "Explicador Ejercicios":
     st.subheader("🧩 Explicador paso a paso")
-    texto = st.text_area("Introduce el ejercicio")
+    texto = st.text_area("Introduce el ejercicio")  # Texto visible
     if st.button("Explicar"):
         if texto:
             st.success("✅ Explicación generada:")
@@ -99,7 +99,7 @@ elif opcion == "Explicador Ejercicios":
 
 elif opcion == "Presentaciones":
     st.subheader("🎤 Generador de Presentaciones")
-    texto = st.text_area("Introduce el tema")
+    texto = st.text_area("Introduce el tema")  # Texto visible
     if st.button("Generar Presentación"):
         if texto:
             st.success("✅ Presentación generada:")
@@ -118,3 +118,4 @@ elif opcion == "Transcripción Audio":
         st.success("✅ Resumen del audio:")
         st.markdown(f"<div style='background:#f0fff0;padding:10px;border-radius:10px;'>{resumir_texto(texto_transcrito)}</div>", unsafe_allow_html=True)
 
+    
