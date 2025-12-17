@@ -6,8 +6,10 @@ from PIL import Image
 import whisper
 import tempfile
 import os
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail
 
-# ------------------ CONFIG STREAMLIT ------------------
+# ------------------ CONFIG ------------------
 st.set_page_config(
     page_title="SmartClass Helper",
     page_icon="🎓",
@@ -15,17 +17,12 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# ------------------ CARGA DE MODELOS (CACHE) ------------------
+# ------------------ CARGA DE MODELOS ------------------
 @st.cache_resource
 def cargar_gpt():
     tokenizer = AutoTokenizer.from_pretrained("EleutherAI/gpt-neo-125M")
     model = AutoModelForCausalLM.from_pretrained("EleutherAI/gpt-neo-125M")
-    return pipeline(
-        "text-generation",
-        model=model,
-        tokenizer=tokenizer,
-        device=-1
-    )
+    return pipeline("text-generation", model=model, tokenizer=tokenizer, device=-1)
 
 @st.cache_resource
 def cargar_whisper():
@@ -80,6 +77,22 @@ def transcribir_audio(archivo):
     os.remove(ruta)
     return resultado["text"]
 
+# ------------------ ENVIO DE CORREO CON SENDGRID ------------------
+def enviar_correo_sendgrid(destinatario, asunto, mensaje):
+    mail = Mail(
+        from_email='raulolmedomartinez@gesanmiguel2.com',
+        to_emails=destinatario,
+        subject=asunto,
+        plain_text_content=mensaje
+    )
+    try:
+        sg = SendGridAPIClient(st.secrets["SENDGRID_API_KEY"])
+        response = sg.send(mail)
+        return response.status_code
+    except Exception as e:
+        st.error(f"Error al enviar correo: {e}")
+        return None
+
 # ------------------ ESTILO ------------------
 st.markdown("""
 <style>
@@ -130,57 +143,150 @@ opcion = st.sidebar.selectbox("Selecciona una función", [
 
 # ------------------ FUNCIONES ------------------
 if opcion == "Resumidor":
+    st.subheader("📝 Resumidor de Textos")
     texto = st.text_area("Introduce el texto")
-    if st.button("Resumir"):
+    correo_destino = st.text_input("Introduce tu correo para recibir el resumen")
+    if st.button("Resumir y enviar"):
         if not texto.strip():
-            st.warning("⚠️ Introduce un texto")
+            st.warning("Introduce un texto primero")
+        elif not correo_destino.strip():
+            st.warning("Introduce un correo válido")
         else:
-            st.success(resumir_texto(texto))
+            resumen = resumir_texto(texto)
+            st.success("✅ Resumen generado:")
+            st.markdown(f"<div style='background:#fff0f5;padding:10px;border-radius:10px;'>{resumen}</div>", unsafe_allow_html=True)
+            
+            # Enviar correo
+            status = enviar_correo_sendgrid(correo_destino, "Resumen SmartClass", resumen)
+            if status and status < 400:
+                st.success(f"📧 Resumen enviado a {correo_destino} ✅")
+            else:
+                st.error("❌ No se pudo enviar el correo")
 
 elif opcion == "Ejercicios":
+    st.subheader("📚 Generador de Ejercicios")
     texto = st.text_area("Introduce el tema")
-    if st.button("Generar"):
-        st.success(generar_ejercicios(texto))
+    correo_destino = st.text_input("Correo para recibir ejercicios")
+    if st.button("Generar y enviar"):
+        if not texto.strip():
+            st.warning("Introduce un tema primero")
+        elif not correo_destino.strip():
+            st.warning("Introduce un correo válido")
+        else:
+            ejercicios = generar_ejercicios(texto)
+            st.success("✅ Ejercicios generados:")
+            st.markdown(f"<div style='background:#f0fff0;padding:10px;border-radius:10px;'>{ejercicios}</div>", unsafe_allow_html=True)
+            status = enviar_correo_sendgrid(correo_destino, "Ejercicios SmartClass", ejercicios)
+            if status and status < 400:
+                st.success(f"📧 Ejercicios enviados a {correo_destino} ✅")
+            else:
+                st.error("❌ No se pudo enviar el correo")
 
 elif opcion == "Organizador Tareas":
+    st.subheader("📅 Organizador de Tareas")
     texto = st.text_area("Introduce tus tareas")
-    if st.button("Organizar"):
-        st.success(organizar_tareas(texto))
+    correo_destino = st.text_input("Correo para recibir las tareas organizadas")
+    if st.button("Organizar y enviar"):
+        if not texto.strip():
+            st.warning("Introduce las tareas primero")
+        elif not correo_destino.strip():
+            st.warning("Introduce un correo válido")
+        else:
+            tareas = organizar_tareas(texto)
+            st.success("✅ Tareas organizadas:")
+            st.markdown(f"<div style='background:#f0f8ff;padding:10px;border-radius:10px;'>{tareas}</div>", unsafe_allow_html=True)
+            status = enviar_correo_sendgrid(correo_destino, "Tareas Organizadas SmartClass", tareas)
+            if status and status < 400:
+                st.success(f"📧 Tareas enviadas a {correo_destino} ✅")
+            else:
+                st.error("❌ No se pudo enviar el correo")
 
 elif opcion == "Explicador Ejercicios":
+    st.subheader("🧩 Explicador paso a paso")
     texto = st.text_area("Introduce el ejercicio")
-    if st.button("Explicar"):
-        st.success(explicar_ejercicio(texto))
+    correo_destino = st.text_input("Correo para recibir la explicación")
+    if st.button("Explicar y enviar"):
+        if not texto.strip():
+            st.warning("Introduce un ejercicio primero")
+        elif not correo_destino.strip():
+            st.warning("Introduce un correo válido")
+        else:
+            explicacion = explicar_ejercicio(texto)
+            st.success("✅ Explicación generada:")
+            st.markdown(f"<div style='background:#fffaf0;padding:10px;border-radius:10px;'>{explicacion}</div>", unsafe_allow_html=True)
+            status = enviar_correo_sendgrid(correo_destino, "Explicación SmartClass", explicacion)
+            if status and status < 400:
+                st.success(f"📧 Explicación enviada a {correo_destino} ✅")
+            else:
+                st.error("❌ No se pudo enviar el correo")
 
 elif opcion == "Presentaciones":
+    st.subheader("🎤 Generador de Presentaciones")
     texto = st.text_area("Introduce el tema")
-    if st.button("Generar"):
-        st.success(generar_presentacion(texto))
+    correo_destino = st.text_input("Correo para recibir la presentación")
+    if st.button("Generar y enviar"):
+        if not texto.strip():
+            st.warning("Introduce un tema primero")
+        elif not correo_destino.strip():
+            st.warning("Introduce un correo válido")
+        else:
+            presentacion = generar_presentacion(texto)
+            st.success("✅ Presentación generada:")
+            st.markdown(f"<div style='background:#f5fffa;padding:10px;border-radius:10px;'>{presentacion}</div>", unsafe_allow_html=True)
+            status = enviar_correo_sendgrid(correo_destino, "Presentación SmartClass", presentacion)
+            if status and status < 400:
+                st.success(f"📧 Presentación enviada a {correo_destino} ✅")
+            else:
+                st.error("❌ No se pudo enviar el correo")
 
 elif opcion == "PDF → Resumen":
     archivo = st.file_uploader("Sube un PDF", type=["pdf"])
-    if archivo:
+    correo_destino = st.text_input("Correo para recibir el resumen")
+    if archivo and st.button("Procesar y enviar"):
         texto = leer_pdf(archivo)
         st.subheader("📄 Texto extraído")
         st.write(texto)
+        resumen = resumir_texto(texto)
         st.subheader("📝 Resumen")
-        st.success(resumir_texto(texto))
+        st.success(resumen)
+        if correo_destino.strip():
+            status = enviar_correo_sendgrid(correo_destino, "Resumen PDF SmartClass", resumen)
+            if status and status < 400:
+                st.success(f"📧 Resumen enviado a {correo_destino} ✅")
+            else:
+                st.error("❌ No se pudo enviar el correo")
 
 elif opcion == "Imagen → Texto":
     archivo = st.file_uploader("Sube una imagen", type=["png", "jpg", "jpeg"])
-    if archivo:
+    correo_destino = st.text_input("Correo para recibir el resumen")
+    if archivo and st.button("Procesar y enviar"):
         texto = leer_imagen(archivo)
         st.subheader("🖼️ Texto detectado")
         st.write(texto)
+        resumen = resumir_texto(texto)
         st.subheader("📝 Resumen")
-        st.success(resumir_texto(texto))
+        st.success(resumen)
+        if correo_destino.strip():
+            status = enviar_correo_sendgrid(correo_destino, "Resumen Imagen SmartClass", resumen)
+            if status and status < 400:
+                st.success(f"📧 Resumen enviado a {correo_destino} ✅")
+            else:
+                st.error("❌ No se pudo enviar el correo")
 
 elif opcion == "Audio → Transcripción":
     archivo = st.file_uploader("Sube audio", type=["mp3", "wav", "m4a"])
-    if archivo:
+    correo_destino = st.text_input("Correo para recibir el resumen")
+    if archivo and st.button("Transcribir y enviar"):
         with st.spinner("Transcribiendo audio..."):
             texto = transcribir_audio(archivo)
         st.subheader("🎙️ Transcripción")
         st.write(texto)
+        resumen = resumir_texto(texto)
         st.subheader("📝 Resumen")
-        st.success(resumir_texto(texto))
+        st.success(resumen)
+        if correo_destino.strip():
+            status = enviar_correo_sendgrid(correo_destino, "Resumen Audio SmartClass", resumen)
+            if status and status < 400:
+                st.success(f"📧 Resumen enviado a {correo_destino} ✅")
+            else:
+                st.error("❌ No se pudo enviar el correo")
