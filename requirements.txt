@@ -7,3 +7,7 @@ Pillow
 PyPDF2
 ffmpeg-python
 sendgrid
+flask
+twilio
+transformers
+torch
