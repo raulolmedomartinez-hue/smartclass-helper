@@ -41,7 +41,6 @@ def consultar_gpt(prompt, max_tokens=250):
         repetition_penalty=1.2
     )
     texto_generado = resultado[0]["generated_text"]
-    # Quitar el prompt de la salida si se repite
     if texto_generado.startswith(prompt):
         texto_generado = texto_generado[len(prompt):].strip()
     return texto_generado
@@ -126,34 +125,45 @@ def enviar_correo_sendgrid(destinatario, asunto, mensaje):
         st.error(f"Error al enviar correo: {e}")
         return None
 
-# ------------------ ESTILO ------------------
+# ------------------ ESTILO OSCURO ------------------
 st.markdown("""
 <style>
 body, .stApp {
-    background: linear-gradient(135deg, #a8edea, #fed6e3);
-    font-family: 'Segoe UI';
+    background-color: #1e1e1e;
+    color: #f0f0f0;
+    font-family: 'Segoe UI', sans-serif;
 }
-h1 {
-    background: linear-gradient(90deg, #ff758c, #ff7eb3);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+h1, h2, h3 {
+    color: #ffffff;
 }
 .stButton>button {
-    background: linear-gradient(45deg, #ff758c, #ff7eb3);
-    color: white;
-    border-radius: 15px;
+    background-color: #4b4b4b;
+    color: #ffffff;
+    border-radius: 10px;
+    height: 3em;
+    width: 100%;
     font-size: 16px;
     font-weight: bold;
+    transition: all 0.3s ease;
+}
+.stButton>button:hover {
+    background-color: #6c6c6c;
 }
 .stTextArea textarea {
-    background-color: white;
-    color: black;
+    background-color: #2e2e2e !important;
+    color: #ffffff !important;
+    border-radius: 10px;
+    border: 1px solid #555555;
+    padding: 10px;
+}
+.stFileUploader>div>div>input {
+    border-radius: 10px;
 }
 section[data-testid="stSidebar"] {
-    background-color: #1f3b82;
+    background-color: #2a2a2a;
 }
 section[data-testid="stSidebar"] * {
-    color: white;
+    color: #ffffff;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -187,13 +197,17 @@ if opcion == "Resumidor":
         else:
             resumen = resumir_texto(texto)
             st.success("✅ Resumen generado:")
-            st.markdown(f"<div style='background:#fff0f5;padding:10px;border-radius:10px;'>{resumen}</div>", unsafe_allow_html=True)
+            st.markdown(f"<div style='background:#2e2e2e;padding:10px;border-radius:10px;color:#f0f0f0;'>{resumen}</div>", unsafe_allow_html=True)
             
             status = enviar_correo_sendgrid(correo_destino, "Resumen SmartClass", resumen)
             if status and status < 400:
                 st.success(f"📧 Resumen enviado a {correo_destino} ✅")
             else:
                 st.error("❌ No se pudo enviar el correo")
+
+# ------------------ Las demás secciones (Ejercicios, Tareas, PDF, Imagen, Audio, etc.)
+# Se implementan igual, usando las funciones GPT con prompts mejorados y la interfaz oscura.
+
 
 # ------------------ Las demás secciones funcionan igual que antes ------------------
 # Solo se reemplaza la llamada a la función GPT por la versión con prompts mejorados
